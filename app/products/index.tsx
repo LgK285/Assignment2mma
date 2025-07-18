@@ -23,6 +23,7 @@ export default function ProductListScreen() {
   const [search, setSearch] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState('');
+  const [sortByPrice, setSortByPrice] = useState<'asc' | 'desc' | ''>('');
   const router = useRouter();
   const { itemCount } = useCart();
 
@@ -35,8 +36,9 @@ export default function ProductListScreen() {
       setLoading(true);
       setError('');
 
-      const data = await fetchProducts(LIMIT, refresh ? 0 : skip, search);
-      const newProducts = data.products || [];
+      const data = await fetchProducts(LIMIT, refresh ? 0 : skip, search, sortByPrice);
+      const newProducts = data || [];
+      console.log('Fetched products:', newProducts);
 
       if (refresh) {
         setProducts(newProducts);
@@ -60,7 +62,7 @@ export default function ProductListScreen() {
     }, 500); // Debounce search
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, sortByPrice]);
 
   const renderItem = ({ item }: { item: any }) => (
     <ProductCard
@@ -93,6 +95,9 @@ export default function ProductListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.shopHeader}>
+        <Text style={styles.shopTitle}>ECommerce Shop</Text>
+      </View>
       <View style={styles.header}>
         <TextInput
           style={styles.searchInput}
@@ -108,6 +113,21 @@ export default function ProductListScreen() {
           <Text style={styles.cartCount}>{itemCount}</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.filterRow}>
+        <Text style={styles.filterLabel}>Lọc theo giá:</Text>
+        <TouchableOpacity
+          style={[styles.filterBtn, sortByPrice === 'asc' && styles.filterBtnActive]}
+          onPress={() => setSortByPrice(sortByPrice === 'asc' ? '' : 'asc')}
+        >
+          <Text style={styles.filterText}>Tăng dần</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterBtn, sortByPrice === 'desc' && styles.filterBtnActive]}
+          onPress={() => setSortByPrice(sortByPrice === 'desc' ? '' : 'desc')}
+        >
+          <Text style={styles.filterText}>Giảm dần</Text>
+        </TouchableOpacity>
+      </View>
 
       {error ? (
         <Text style={styles.error}>{error}</Text>
@@ -116,6 +136,7 @@ export default function ProductListScreen() {
           data={products}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
           onEndReached={() => loadProducts(false)}
           onEndReachedThreshold={0.2}
           ListFooterComponent={renderFooter}
@@ -131,6 +152,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  shopHeader: {
+    backgroundColor: Colors.light.tint,
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    marginBottom: 4,
+    elevation: 4,
+  },
+  shopTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   header: {
     flexDirection: 'row',
@@ -173,7 +210,36 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   list: {
-    padding: 16,
+    padding: 8,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  filterLabel: {
+    fontSize: 15,
+    marginRight: 8,
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  filterBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    marginRight: 8,
+  },
+  filterBtnActive: {
+    backgroundColor: Colors.light.tint,
+  },
+  filterText: {
+    color: '#333',
+    fontWeight: 'bold',
   },
   footer: {
     paddingVertical: 16,

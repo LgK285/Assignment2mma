@@ -84,20 +84,11 @@ export default function ProductDetailScreen() {
         }}
       />
       <ScrollView contentContainerStyle={styles.container}>
-        <Image source={{ uri: product.thumbnail }} style={styles.image} />
+        <Image source={{ uri: product.image }} style={styles.image} />
         <View style={styles.detailsContainer}>
           <Text style={styles.title}>{product.title}</Text>
           <Text style={styles.price}>${product.price}</Text>
           <Text style={styles.description}>{product.description}</Text>
-          
-          {product.stock > 0 ? (
-            <View style={styles.stockInfo}>
-              <Text style={styles.inStock}>In Stock</Text>
-              <Text style={styles.stockCount}>({product.stock} available)</Text>
-            </View>
-          ) : (
-            <Text style={styles.outOfStock}>Out of Stock</Text>
-          )}
 
           {cartItem && (
             <Text style={styles.inCart}>
@@ -106,13 +97,10 @@ export default function ProductDetailScreen() {
           )}
 
           <TouchableOpacity
-            style={[styles.addToCartButton, product.stock === 0 && styles.disabledButton]}
+            style={styles.addToCartButton}
             onPress={handleAddToCart}
-            disabled={product.stock === 0}
           >
-            <Text style={styles.addToCartText}>
-              {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-            </Text>
+            <Text style={styles.addToCartText}>Add to Cart</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

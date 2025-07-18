@@ -5,7 +5,15 @@ export const useCart = () => {
   const { state, dispatch } = useContext(CartContext);
 
   const addToCart = (product: any) => {
-    dispatch({ type: 'ADD_TO_CART', payload: product });
+    // Đảm bảo có thumbnail cho CartItem
+    const cartItem = {
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      thumbnail: product.image || product.thumbnail,
+      quantity: 1,
+    };
+    dispatch({ type: 'ADD_TO_CART', payload: cartItem });
   };
 
   const removeFromCart = (id: number) => {
